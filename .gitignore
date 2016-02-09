@@ -1,0 +1,9 @@
+.*.swp
+
+/*/ca.key.pem
+/*/ca.req.pem
+/*/ca.cert.pem
+
+/*/index.txt*
+/*/serial.txt*
+/*/signed.d

@@ -1,0 +1,58 @@
+# This definition stops the following lines choking if HOME isn't
+# defined.
+HOME                    = .
+RANDFILE                = $ENV::HOME/.rnd
+
+default_md = sha512
+#default_md = sha1
+#default_md = default
+
+[ ca ]
+default_ca = __bare_ca__
+
+[ req ]
+distinguished_name = __empty_dn__
+string_mask = utf8only
+
+#-----------------------------------------------------------------------------
+# minimal sections for parameters
+
+[ __empty_dn__ ]
+
+[ __bare_ca__ ]
+dir = $ENV::CA_HOME
+database = $dir/index.txt
+serial = $dir/serial.txt
+policy = policy_anything
+# XXX: this is a bad idea to keep this for a production CA; see OpenSSL's
+# documentation for details
+copy_extensions = copy
+
+#-----------------------------------------------------------------------------
+# X.509 certificate extensions
+
+[ ext_ca ]
+basicConstraints = CA:TRUE
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+
+[ ext_leaf ]
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+#-----------------------------------------------------------------------------
+# DN accepting policy for signing certificates
+
+[ policy_anything ]
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = optional
+emailAddress            = optional
+
+#-----------------------------------------------------------------------------
+# vim:ft=dosini
