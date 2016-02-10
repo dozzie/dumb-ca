@@ -115,7 +115,7 @@ sign-opts:
 %.req.pem: %.key.pem
 	CA_HOME=$(dir $@) openssl req -batch -config $(CNF) -extensions $(CA_EXTS) -new -days $(CA_DAYS) -key $< -subj '$(SUBJECT)' -out $@
 
-%.cert.pem: %.req.pem $(PARENT_CA)
+%.cert.pem: %.req.pem
 	CA_HOME=$(PARENT_CA) openssl ca -batch -config $(CNF) -extensions $(CA_EXTS) -in $< -out $@ -outdir $(PARENT_CA)/signed.d -cert $(PARENT_CA)/ca.cert.pem -keyfile $(PARENT_CA)/ca.key.pem -days $(CA_DAYS)
 
 # }}}
