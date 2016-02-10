@@ -17,6 +17,8 @@ CA_DAYS = 1095
 LEAF_EXTS = ext_leaf
 LEAF_DAYS = 365
 
+EXTENSIONS = $(LEAF_EXTS)
+
 .SECONDARY: $(CA_KEYS) $(CA_REQS) $(CA_CERTS)
 
 .PHONY: default
@@ -64,8 +66,8 @@ help:
 	echo "Available targets:"
 	echo "  ca"
 	echo "  ca-clean"
-	echo "  sign      CA=ca_name REQ=file.req.pem [CERT=file.cert.pem]"
-	echo "  sign-opts CA=ca_name REQ=file.req.pem [CERT=file.cert.pem] OPTS='...'"
+	echo "  sign CA=ca_name REQ=file.req.pem [CERT=file.cert.pem] [EXTENSIONS=section]"
+	echo "  sign-opts [vars as with \`sign'] OPTS='...'"
 	echo "Known CAs:"
 	printf '  %s\n' $(CERTIFICATE_AUTHORITIES)
 
@@ -85,7 +87,7 @@ sign: sign-opts
 
 sign-opts: $(CA)
 sign-opts:
-	CA_HOME=$(if $(CA),$(CA),$(error No CA=... specified)) openssl ca -batch -config $(CNF) -extensions $(LEAF_EXTS) -in $(if $(REQ),$(REQ),$(error No REQ=... specified)) -out $(if $(CERT),$(CERT),$(REQ:.req.pem=.cert.pem)) -outdir $(CA)/signed.d -cert $(CA)/ca.cert.pem -keyfile $(CA)/ca.key.pem $(OPTS)
+	CA_HOME=$(if $(CA),$(CA),$(error No CA=... specified)) openssl ca -batch -config $(CNF) -extensions $(EXTENSIONS) -in $(if $(REQ),$(REQ),$(error No REQ=... specified)) -out $(if $(CERT),$(CERT),$(REQ:.req.pem=.cert.pem)) -outdir $(CA)/signed.d -cert $(CA)/ca.cert.pem -keyfile $(CA)/ca.key.pem $(OPTS)
 
 #-----------------------------------------------------------------------------
 # building CA {{{
@@ -116,7 +118,7 @@ sign-opts:
 	CA_HOME=$(dir $@) openssl req -batch -config $(CNF) -extensions $(CA_EXTS) -new -days $(CA_DAYS) -key $< -subj '$(SUBJECT)' -out $@
 
 %.cert.pem: %.req.pem
-	CA_HOME=$(PARENT_CA) openssl ca -batch -config $(CNF) -extensions $(CA_EXTS) -in $< -out $@ -outdir $(PARENT_CA)/signed.d -cert $(PARENT_CA)/ca.cert.pem -keyfile $(PARENT_CA)/ca.key.pem -days $(CA_DAYS)
+	${MAKE} sign-opts CA=$(PARENT_CA) REQ=$< CERT=$@ EXTENSIONS=$(CA_EXTS) OPTS='-days $(CA_DAYS)'
 
 # }}}
 #-----------------------------------------------------------
