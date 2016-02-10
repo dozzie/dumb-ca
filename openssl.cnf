@@ -1,7 +1,7 @@
 # This definition stops the following lines choking if HOME isn't
 # defined.
-HOME                    = .
-RANDFILE                = $ENV::HOME/.rnd
+HOME     = .
+RANDFILE = $ENV::HOME/.rnd
 
 default_md = sha512
 #default_md = sha1
